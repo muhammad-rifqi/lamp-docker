@@ -1,0 +1,108 @@
+version: '3'
+service:
+  db:
+    image:mysql:latest
+    enviroment:
+      MYSQL_DATABASE:lamp_docker
+      MYSQL_USER:lamp_docker
+      MYSQL_PASSWORD:lamp_docker
+      MYSQL_ALLOW_EMPTY_PASSWORD:1
+    volumes:
+      -"./db:/docker-entrypoint-initdb.d"
+    networks:
+      - lamp-docker
+  www:
+    image:php:8.1.1-apache
+    volumes:
+      -"./:/var/www/html"
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - lamp-docker
+  phpmyadmin:
+    image:phpmyadmin/phpmyadmin
+    ports:
+      - 8001:80
+    environment
+      - PMA_HOST:db
+      - PMA_PORT:3306
+    networks:
+      - lamp-docker
+networks:
+  lamp-docker:
+    driver:bridge
+
+
+    ////////////////////////
+
+    >wsl --update
+    wsl --version
+    wsl --update --rollback
+
+
+docker-compose up/down
+
+
+    ///////////////////
+
+
+    version: '3.7'
+
+services:
+    php-httpd:
+        image: php:7.4-apache
+        ports:
+            - 80:80
+        volumes:
+            - ./www:/var/www/html
+
+    mariadb:
+        image: mariadb:10.6.8
+        volumes:
+            - vol-mariadb:/var/lib/mysql
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+            MYSQL_ROOT_PASSWORD: "secret"
+            MYSQL_USER: "myuser"
+            MYSQL_PASSWORD: "mypass"
+            MYSQL_DATABASE: "mydb"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        links:
+            - mariadb:db
+        ports:
+            - 8181:80
+
+volumes:
+    vol-mariadb:            
+
+
+
+////////////
+
+
+services:
+  web:
+    image: "apache:${PHP_VERSION}"
+    restart: 'always'
+    depends_on:
+      - mariadb
+    restart: 'always'
+    ports:
+      - '8080:80'
+    links:
+      - mariadb
+  mariadb:
+    image: "mariadb:${MARIADB_VERSION}"
+    restart: 'always'
+    volumes: 
+      - "/var/lib/mysql/data:${MARIADB_DATA_DIR}"
+      - "/var/lib/mysql/logs:${MARIADB_LOG_DIR}"
+      - /var/docker/mariadb/conf:/etc/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
