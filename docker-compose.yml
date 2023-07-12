@@ -25,7 +25,7 @@ services:
       - "/var/lib/mysql/logs:/var/lib/mysql"
       - /var/docker/mariadb/conf:/etc/mysql
     environment:
-        MYSQL_ALLOW_EMPTY_PASSWORD: "no"
+        MYSQL_ALLOW_EMPTY_PASSWORD: true
         MYSQL_ROOT_PASSWORD: "secret"
         MYSQL_USER: "myuser"
         MYSQL_PASSWORD: "mypass"
